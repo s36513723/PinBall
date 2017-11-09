@@ -20,69 +20,69 @@ public class FripperController : MonoBehaviour
         //フリッパーの傾きを設定
         SetAngle(this.defaultAngle);
     }
-
+		
     // Update is called once per frame
     void Update()
     { 
-        if (Input.touchCount > 0)
-        {
-            Touch touch = Input.GetTouch(0);
-            if (touch.phase == TouchPhase.Began && touch.position.x > Screen.width * 0.5f && tag == "LeftFripperTag")
-            {
-                SetAngle(this.flickAngle);
-            }   
-            if (touch.phase == TouchPhase.Began && touch.position.x < Screen.width * 0.5f && tag == "RightFripperTag")
-            {
-                SetAngle(this.flickAngle);
-            }
-
-            if (touch.phase == TouchPhase.Ended && tag == "LeftFripperTag")
-            {
-                SetAngle(this.defaultAngle);
-            }
-            if (touch.phase == TouchPhase.Ended && tag == "RightFripperTag")
-            {
-                SetAngle(this.defaultAngle);
-            }
-            
+        //タッチ操作に対応(追記)
+		if (Input.touchCount > 0)
+		{
+			for (int i = 0; i < Input.touchCount; i++) 
+			{
+				Touch touch = Input.GetTouch (i);
+				if (touch.phase == TouchPhase.Began) {
+					if (Input.GetTouch(i).position.x < Screen.width / 2.0f ) {
+						if (tag == "LeftFripperTag") {
+							SetAngle(this.flickAngle);
+						}
+					}
+					if (Input.GetTouch(i).position.x > Screen.width / 2.0f) {
+						if (tag == "RightFripperTag") {
+							SetAngle(this.flickAngle);
+						}
+					}
+				}
+			    if (touch.phase == TouchPhase.Ended) {
+					if (tag == "LeftFripperTag") {
+							SetAngle (this.defaultAngle);
+					}
+					if (tag == "RightFripperTag") {
+							SetAngle (this.defaultAngle);
+					}
+				}
+			}
         }
+	    // 左矢印キーを押した時、左フリッパーを動かす
+		if (Input.GetKeyDown(KeyCode.LeftArrow) && tag == "LeftFripperTag")
+		{
+			SetAngle(this.flickAngle);
+		}
 
-        // 左矢印キーを押した時、左フリッパーを動かす
-        if (Input.GetKeyDown(KeyCode.LeftArrow) && tag == "LeftFripperTag")
-        {
-            SetAngle(this.flickAngle);
-        }
+		// 右矢印キーを押した時、右フリッパーを動かす
+		if (Input.GetKeyDown(KeyCode.RightArrow) && tag == "RightFripperTag")
+		{
+			SetAngle(this.flickAngle);
+		}
 
-        // 右矢印キーを押した時、右フリッパーを動かす
-        if (Input.GetKeyDown(KeyCode.RightArrow) && tag == "RightFripperTag")
-        {
-            SetAngle(this.flickAngle);
-        }
+		// 矢印キーを離した時、フリッパーを元に戻す
+		if (Input.GetKeyUp(KeyCode.LeftArrow) && tag == "LeftFripperTag")
+		{
+			SetAngle(this.defaultAngle);
+		}
+		// 矢印キーを離した時、フリッパーを元に戻す
+		if (Input.GetKeyUp(KeyCode.RightArrow) && tag == "RightFripperTag")
+		{
+			SetAngle(this.defaultAngle);
+		}
+	}
 
-        // 矢印キーを離した時、フリッパーを元に戻す
-        if (Input.GetKeyUp(KeyCode.LeftArrow) || Input.GetKeyUp(KeyCode.RightArrow))
-        {
-            SetAngle(this.defaultAngle);
-        }
 
-        // マウスの左クリックを押した時及びスマートフォンでタップした時、フリッパーを動かす
-        if (Input.GetMouseButton(0))
-        {
-            SetAngle(this.flickAngle);
-        }
+	//フリッパーの傾きを設定
+	public void SetAngle(float angle)
+	{
+			JointSpring jointSpr = this.myHingeJoint.spring;
+			jointSpr.targetPosition = angle;
+			this.myHingeJoint.spring = jointSpr;
+	}
 
-        // マウスの左クリックを話した時及びスマートフォンでタップを外した時に、フリッパーを元に戻す
-        if (Input.GetMouseButtonUp(0))
-        {
-            SetAngle(this.defaultAngle);
-        }
-    }    
-            
-    //フリッパーの傾きを設定
-    public void SetAngle(float angle)
-    {
-        JointSpring jointSpr = this.myHingeJoint.spring;
-        jointSpr.targetPosition = angle;
-        this.myHingeJoint.spring = jointSpr;
-    }
 }
